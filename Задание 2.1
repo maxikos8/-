@@ -1,0 +1,8 @@
+select
+count(distinct student_id) as "количество лучших студентов"
+from
+(select	student_id,ASQ.time,count(correct) as cnt from
+(Select	student_id,	timetest, correct, tsrange(timetest , timetest+interval'1hour','[]') as time
+from students where correct=True and extract (month from timetest) = 4 and extract (year from timetest) = 2021 ) ASQ
+ where timetest BETWEEN lower(ASQ.time) AND upper(ASQ.time) group by student_id, ASQ.time order by cnt desc) BQ
+group by student_id having sum(BQ.cnt) > 30
